@@ -22,10 +22,12 @@ int main() {
     srand(time(0));
     target = (rand() % (RAND_MAX - RAND_MIN + 1)) + RAND_MIN;
     
+    target = 40;
+    
     clrscr();
     
     for (x = 1; x <= WINDOW_WIDTH; x++) {
-        gotoxy(x, 24);
+        gotoxy(x, WINDOW_HEIGHT);
         
         if (x == target) {
             printf("O");
@@ -66,11 +68,17 @@ int main() {
         offset_x = x + X_OFFSET;
         inverted_y = WINDOW_HEIGHT - y;
         
-        gotoxy(offset_x, inverted_y);
-        printf("o");
+        if (offset_x >= 1 && offset_x <= WINDOW_WIDTH && inverted_y >= 1 && inverted_y <= WINDOW_HEIGHT) {
+            gotoxy(offset_x, inverted_y);
+            printf("o");
+        } else if (offset_x < 1 || offset_x > WINDOW_WIDTH) {
+            gotoxy(43, WINDOW_HEIGHT + 1);
+            printf("Trajectory exceeded horizontal bound.");
+        }
         
         if (offset_x == target && inverted_y == 24) {
-            printf(" You hit the target!");
+            gotoxy(target + 2, WINDOW_HEIGHT - 2);
+            printf("You hit the target!");
         }
         
         delay(1);
