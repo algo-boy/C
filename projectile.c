@@ -4,8 +4,8 @@
 #include <stdlib.h>
 #include <dos.h>
 
-#define WINDOW_WIDTH 80
-#define WINDOW_HEIGHT 24
+#define SCREEN_WIDTH 80
+#define SCREEN_HEIGHT 25
 
 #define TIME_STEP 0.001
 #define X_OFFSET 2
@@ -15,21 +15,45 @@
 #define PI 3.1416
 #define G 9.81
 
+#define HIDE_CURSOR gotoxy(SCREEN_WIDTH, SCREEN_HEIGHT)
+
+void display_intro_screen() {
+    clrscr();
+    
+    gotoxy(1, 9);
+    printf("                          ________           ________________\n");
+    printf("     ___________________________(_)____________  /___(_)__  /____   _______\n");
+    printf("     ___  __ \\_  ___/  __ \\____  /_  _ \\  ___/  __/_  /__  /_  _ \\  _  ___/\n");
+    printf("     __  /_/ /  /   / /_/ /___  / /  __/ /__ / /_ _  / _  / /  __/__/ /__\n");
+    printf("     _  .___//_/    \\____/___  /  \\___/\\___/ \\__/ /_/  /_/  \\___/_(_)___/\n");
+    printf("     /_/                  /___/\n");
+    
+    gotoxy(35, 16);
+    
+    printf("[ START ]");
+    
+    HIDE_CURSOR;
+    
+    getch();
+}
+
 int main() {
     float v_0, theta, v_x0, v_y0, T, R, H, t;
-    int x, y, target;
+    int x, y, target_x, ground_y = SCREEN_HEIGHT - 1;
     
     srand(time(0));
-    target = (rand() % (RAND_MAX - RAND_MIN + 1)) + RAND_MIN;
+    target_x = (rand() % (RAND_MAX - RAND_MIN + 1)) + RAND_MIN;
     
-    target = 40;
+    target_x = 40; // Test Position
+    
+    display_intro_screen();
     
     clrscr();
     
-    for (x = 1; x <= WINDOW_WIDTH; x++) {
-        gotoxy(x, WINDOW_HEIGHT);
+    for (x = 1; x <= SCREEN_WIDTH; x++) {
+        gotoxy(x, ground_y);
         
-        if (x == target) {
+        if (x == target_x) {
             printf("O");
         } else {
             printf("_");
@@ -66,19 +90,21 @@ int main() {
         y = v_y0 * t - 0.5 * G * t * t;
         
         offset_x = x + X_OFFSET;
-        inverted_y = WINDOW_HEIGHT - y;
+        inverted_y = ground_y - y;
         
-        if (offset_x >= 1 && offset_x <= WINDOW_WIDTH && inverted_y >= 1 && inverted_y <= WINDOW_HEIGHT) {
+        if (offset_x >= 1 && offset_x <= SCREEN_WIDTH && inverted_y >= 1 && inverted_y <= ground_y) {
             gotoxy(offset_x, inverted_y);
             printf("o");
-        } else if (offset_x < 1 || offset_x > WINDOW_WIDTH) {
-            gotoxy(43, WINDOW_HEIGHT + 1);
+        } else if (offset_x < 1 || offset_x > SCREEN_WIDTH) {
+            gotoxy(43, SCREEN_HEIGHT);
             printf("Trajectory exceeded horizontal bound.");
         }
         
-        if (offset_x == target && inverted_y == 24) {
-            gotoxy(target + 2, WINDOW_HEIGHT - 2);
+        if (offset_x == target_x && inverted_y == 24) {
+            gotoxy(target_x + 2, ground_y - 2);
             printf("You hit the target!");
+            
+            HIDE_CURSOR;
         }
         
         delay(1);
