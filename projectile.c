@@ -9,13 +9,23 @@
 #define TIME_STEP 0.01
 
 #define GROUND_Y 24 // SCREEN_HEIGHT - 1
-#define TARGET_X 40 // SCREEN_HEIGHT / 2
+#define TARGET_X 40 // SCREEN_WIDTH / 2
 #define INITIAL_X 2
 
 #define PI 3.1416
 #define G 9.81
 
 #define HIDE_CURSOR gotoxy(SCREEN_WIDTH, SCREEN_HEIGHT)
+
+void clear_line(int y) {
+    int i;
+    
+    gotoxy(1, y);
+    
+    for (i = 0; i < SCREEN_WIDTH - 1; i++) {
+        putchar(' ');
+    }
+}
 
 void display_intro_screen() {
     clrscr();
@@ -56,43 +66,30 @@ void draw_environment() {
 
 void get_initial_conditions(float *v_0, float *theta) {
     get_inputs:
-
-    gotoxy(2, 2);
     
+    gotoxy(2, 2);
     printf("____________INPUTS____________");
     
     gotoxy(2, 5);
-    
     printf("______________________________");
     
     gotoxy(2, 3);
-    
     printf("Enter initial velocity: ");
     scanf("%f", v_0);
     
     gotoxy(2, 4);
-    
     printf("Enter angle of launch: ");
     scanf("%f", theta);
     
     if (*theta < 1 || *theta > 180) {
-         int x, y;
-        
         gotoxy(44, SCREEN_HEIGHT);
-        
         printf("Keep launch angle between 0 and 180.");
         
         getch();
         
-        gotoxy(26, 3);
-        printf("                                                       ");
-        
-        gotoxy(25, 4);
-        printf("                                                        ");
-        
-        gotoxy(44, SCREEN_HEIGHT);
-        
-        printf("                                    ");
+        clear_line(3);
+        clear_line(4);
+        clear_line(SCREEN_HEIGHT);
         
         goto get_inputs;
     }
@@ -116,35 +113,27 @@ void compute_results(float v_0, float theta, float *v_x0, float *v_y0, float *T,
 
 void display_results(float v_x0, float v_y0, float T, float R, float H) {
     gotoxy(35, 2);
-    
     printf("___________________RESULTS___________________");
     
     gotoxy(35, 3);
-    
     printf("Initial Horizontal Velocity:\t%0.2f m/s", v_x0);
     
     gotoxy(35, 4);
-    
     printf("Initial Vertical Velocity:\t%0.2f m/s", v_y0);
     
     gotoxy(35, 5);
-    
     printf("Time of Flight:\t\t%0.2f seconds", T);
     
     gotoxy(35, 6);
-    
     printf("Range:\t\t\t%0.2f meters", R);
     
     gotoxy(35, 7);
-    
     printf("Maximum Height:\t\t%0.2f meters", H);
     
     gotoxy(35, 8);
-    
     printf("_____________________________________________");
     
-    gotoxy(22, 13);
-    
+    gotoxy(22, GROUND_Y / 2);
     printf("[ PRESS ANY KEY TO PLAY TRAJECTORY ]");
     
     HIDE_CURSOR;
@@ -156,9 +145,7 @@ void draw_trajectory(float T, float v_x0, float v_y0) {
     float t;
     int x, y;
     
-    gotoxy(22, 13);
-    
-    printf("                                    ");
+    clear_line(GROUND_Y / 2);
     
     for (t = 0; t <= T; t += TIME_STEP) {
         int offset_x, inverted_y;
@@ -190,8 +177,6 @@ void draw_trajectory(float T, float v_x0, float v_y0) {
         delay(10);
     }
     
-    HIDE_CURSOR;
-    
     getch();
 }
 
@@ -200,15 +185,17 @@ int main() {
     
     display_intro_screen();
     
-    draw_environment();
+    while (1) {
+        draw_environment();
+        
+        get_initial_conditions(&v_0, &theta);
+        
+        compute_results(v_0, theta, &v_x0, &v_y0, &T, &R, &H);
+        
+        display_results(v_x0, v_y0, T, R, H);
+        
+        draw_trajectory(T, v_x0, v_y0);
+    }
     
-    get_initial_conditions(&v_0, &theta);
-    
-    compute_results(v_0, theta, &v_x0, &v_y0, &T, &R, &H);
-    
-    display_results(v_x0, v_y0, T, R, H);
-    
-    draw_trajectory(T, v_x0, v_y0);
-    
-    return 0;
+    // return 0; Unreachable for now
 }
