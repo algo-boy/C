@@ -9,8 +9,8 @@
 #define TIME_STEP 0.01
 
 #define GROUND_Y 24 // SCREEN_HEIGHT - 1
-#define TARGET_X 40
-#define INITIAL_X_OFFSET 2
+#define TARGET_X 40 // SCREEN_HEIGHT / 2
+#define INITIAL_X 2
 
 #define PI 3.1416
 #define G 9.81
@@ -55,6 +55,8 @@ void draw_environment() {
 }
 
 void get_initial_conditions(float *v_0, float *theta) {
+    get_inputs:
+
     gotoxy(2, 2);
     
     printf("____________INPUTS____________");
@@ -68,10 +70,32 @@ void get_initial_conditions(float *v_0, float *theta) {
     printf("Enter initial velocity: ");
     scanf("%f", v_0);
     
-    gotoxy(2, 4); // Yes, I could've just used space, whatever
+    gotoxy(2, 4);
     
     printf("Enter angle of launch: ");
     scanf("%f", theta);
+    
+    if (*theta < 1 || *theta > 180) {
+         int x, y;
+        
+        gotoxy(44, SCREEN_HEIGHT);
+        
+        printf("Keep launch angle between 0 and 180.");
+        
+        getch();
+        
+        gotoxy(26, 3);
+        printf("                                                       ");
+        
+        gotoxy(25, 4);
+        printf("                                                        ");
+        
+        gotoxy(44, SCREEN_HEIGHT);
+        
+        printf("                                    ");
+        
+        goto get_inputs;
+    }
 }
 
 void compute_results(float v_0, float theta, float *v_x0, float *v_y0, float *T, float *R, float *H) {
@@ -91,33 +115,31 @@ void compute_results(float v_0, float theta, float *v_x0, float *v_y0, float *T,
 }
 
 void display_results(float v_x0, float v_y0, float T, float R, float H) {
-    int results_start_x = 35;
-    
-    gotoxy(results_start_x, 2);
+    gotoxy(35, 2);
     
     printf("___________________RESULTS___________________");
     
-    gotoxy(results_start_x, 3);
+    gotoxy(35, 3);
     
     printf("Initial Horizontal Velocity:\t%0.2f m/s", v_x0);
     
-    gotoxy(results_start_x, 4);
+    gotoxy(35, 4);
     
     printf("Initial Vertical Velocity:\t%0.2f m/s", v_y0);
     
-    gotoxy(results_start_x, 5);
+    gotoxy(35, 5);
     
     printf("Time of Flight:\t\t%0.2f seconds", T);
     
-    gotoxy(results_start_x, 6);
+    gotoxy(35, 6);
     
     printf("Range:\t\t\t%0.2f meters", R);
     
-    gotoxy(results_start_x, 7);
+    gotoxy(35, 7);
     
     printf("Maximum Height:\t\t%0.2f meters", H);
     
-    gotoxy(results_start_x, 8);
+    gotoxy(35, 8);
     
     printf("_____________________________________________");
     
@@ -144,7 +166,7 @@ void draw_trajectory(float T, float v_x0, float v_y0) {
         x = v_x0 * t;
         y = v_y0 * t - 0.5 * G * t * t;
         
-        offset_x = x + INITIAL_X_OFFSET;
+        offset_x = x + INITIAL_X;
         inverted_y = GROUND_Y - y;
         
         if (offset_x >= 1 && offset_x <= SCREEN_WIDTH && inverted_y >= 1 && inverted_y <= GROUND_Y) {
@@ -155,6 +177,8 @@ void draw_trajectory(float T, float v_x0, float v_y0) {
             gotoxy(43, SCREEN_HEIGHT);
             
             printf("Trajectory exceeded horizontal bound.");
+            
+            break;
         }
         
         if (offset_x == TARGET_X && inverted_y == GROUND_Y) {
@@ -167,7 +191,7 @@ void draw_trajectory(float T, float v_x0, float v_y0) {
     }
     
     HIDE_CURSOR;
-
+    
     getch();
 }
 
@@ -185,6 +209,6 @@ int main() {
     display_results(v_x0, v_y0, T, R, H);
     
     draw_trajectory(T, v_x0, v_y0);
-        
+    
     return 0;
 }
