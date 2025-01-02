@@ -6,8 +6,6 @@
 #define SCREEN_CENTER_X SCREEN_WIDTH / 2
 #define SCREEN_CENTER_Y SCREEN_HEIGHT / 2 // Integer division
 
-#define ROPE_LENGTH 11 // Best to be an odd integer
-
 #define HIDE_CURSOR gotoxy(SCREEN_WIDTH, SCREEN_HEIGHT)
 
 void display_title_screen() {
@@ -38,10 +36,8 @@ void get_settings(char *player1_key, char *player2_key, int *rope_length) {
     printf("______________________________");
     
     gotoxy(25, 12);
-    printf("Enter key for Player 1: ");
-    *player1_key = toupper(getchar());
-    
-    while (getchar() != '\n'); // Clears input buffer
+    printf("Press key for Player 1: ");
+    *player1_key = toupper(getche());
     
     // Gets Player 2's control key and compares it to Player 1's
     while (1) {
@@ -54,10 +50,8 @@ void get_settings(char *player1_key, char *player2_key, int *rope_length) {
         }
         
         gotoxy(25, 13);
-        printf("Enter key for Player 2: ");
-        *player2_key = toupper(getchar());
-        
-        while (getchar() != '\n');
+        printf("Press key for Player 2: ");
+        *player2_key = toupper(getche());
         
         if (*player2_key == *player1_key) {
             gotoxy(15, 16);
@@ -148,47 +142,100 @@ void update_rope(int rope_start, int rope_length) {
     HIDE_CURSOR;
 }
 
+int check_win(int rope_start, int rope_length) {
+    if (rope_start == SCREEN_CENTER_X - rope_length + 1) {
+        gotoxy(33, SCREEN_CENTER_Y - 1);
+        printf("Player 1 wins...");
+        
+        return 1;
+    } else if (rope_start == SCREEN_CENTER_X) {
+        gotoxy(33, SCREEN_CENTER_Y - 1);
+        printf("Player 2 wins...");
+        
+        return 2;
+    }
+    
+    return 0;
+}
+
+void update_score(int winner, int *player1_score, int *player2_score) {
+    if (winner == 1) {
+        (*player1_score)++;
+    } else if (winner == 2) {
+        (*player2_score)++;
+    }
+    
+    gotoxy(4, 2);
+    printf("Player 1: %d", *player1_score);
+    
+    gotoxy(44, 2);
+    printf("Player 2: %d", *player2_score);
+}
+
+int prompt_play_again() {
+    char option;
+    
+    gotoxy(25, SCREEN_CENTER_Y + 1);
+    printf("Would you like to play again?");
+    
+    gotoxy(35, SCREEN_CENTER_Y + 2);
+    printf("[Y]es [N]o");
+    
+    HIDE_CURSOR;
+    
+    while (option != 'Y' || option != 'N') {
+        option = toupper(getch());
+        
+        if (option == 'Y') {
+            return 1;
+        } else if (option == 'N') {
+            return 0;
+        }
+    }
+    
+    return -1;
+}
+
 int main() {
-    int rope_length, rope_start;
+    int rope_length, rope_start, playing = 1, winner, player1_score = 0, player2_score = 0;
     char player1_key, player2_key;
     
     display_title_screen();
     
     get_settings(&player1_key, &player2_key, &rope_length);
     
-    draw_center_line();
-    
-    rope_start = SCREEN_CENTER_X - (rope_length / 2);
-    
-    while (1) {
-        char input;
+    // Game loop
+    while (playing) {
+        draw_center_line();
         
-        update_rope(rope_start, rope_length);
+        rope_start = SCREEN_CENTER_X - (rope_length / 2); // Starting rope start position
         
-        if (rope_start == SCREEN_CENTER_X - rope_length + 1) {
-            gotoxy(33, SCREEN_CENTER_Y - 1);
-            printf("Player 1 wins...");
+        update_score(0, &player1_score, &player2_score); // Just displays scoreboard
+        
+        while (1) {
+            char input;
             
-            break;
-        } else if (rope_start == SCREEN_CENTER_X) {
-            gotoxy(33, SCREEN_CENTER_Y - 1);
-            printf("Player 2 wins...");
+            update_rope(rope_start, rope_length);
             
-            break;
-        }
-        
-        input = toupper(getch());
-        
-        if (input == player1_key) {
-            rope_start--;
-        } else if (input == player2_key) {
-            rope_start++;
-        } else if (input == '0') {
-            break;
+            winner = check_win(rope_start, rope_length);
+            
+            if (winner) {
+                update_score(winner, &player1_score, &player2_score);
+                
+                playing = prompt_play_again();
+                
+                break;
+            }
+            
+            input = toupper(getch());
+            
+            if (input == player1_key) {
+                rope_start--;
+            } else if (input == player2_key) {
+                rope_start++;
+            }
         }
     }
-    
-    getch();
     
     return 0;
 }
