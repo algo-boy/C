@@ -166,10 +166,10 @@ void update_score(int winner, int *player1_score, int *player2_score) {
     }
     
     gotoxy(4, 2);
-    printf("Player 1: %d", *player1_score);
+    printf("| Player 1: %d |", *player1_score);
     
     gotoxy(44, 2);
-    printf("Player 2: %d", *player2_score);
+    printf("| Player 2: %d |", *player2_score);
 }
 
 int prompt_play_again() {
@@ -196,23 +196,23 @@ int prompt_play_again() {
     return -1;
 }
 
-void display_end_message() {
-    int offset = 0, direction = 1;
+void display_end_screen() {
+    int header_x = 25, direction = 1;
     
     while (1) {
-        offset += direction;
-        
-        if (offset >= 1 || offset <= -1) {
+        // Animates header movement, reversing direction at one space from original position
+        if (header_x == 24 || header_x == 26) {
             direction = -direction;
         }
+        
+        header_x += direction;
         
         clrscr();
         
         draw_center_line();
         
-        gotoxy(24 + offset, SCREEN_CENTER_Y);
-        
-        printf("o---------THAT'S_ALL---------o");
+        gotoxy(header_x, SCREEN_CENTER_Y);
+        printf("o---------THAT'S-ALL---------o");
         
         gotoxy(25, 13);
         printf("______________________________");
@@ -220,14 +220,19 @@ void display_end_message() {
         gotoxy(29, 14);
         printf("Thank you for playing!");
         
-        gotoxy(30, 15);
+        gotoxy(25, 15);
+        printf("______________________________");
+        
+        gotoxy(36, 16);
         printf("@algo-boy on github");
+        
+        HIDE_CURSOR;
         
         delay(200);
     }
 }
 
-int main() {
+void main() {
     int rope_length, rope_start, playing = 1, winner, player1_score = 0, player2_score = 0;
     char player1_key, player2_key;
     
@@ -241,7 +246,7 @@ int main() {
         
         rope_start = SCREEN_CENTER_X - (rope_length / 2); // Starting rope start position
         
-        update_score(0, &player1_score, &player2_score); // Just displays scoreboard
+        update_score(0, &player1_score, &player2_score); // Just displays scoreboard with 0 as first argument
         
         while (1) {
             char input;
@@ -268,7 +273,5 @@ int main() {
         }
     }
     
-    display_end_message();
-    
-    //return 0;
+    display_end_screen();
 }
