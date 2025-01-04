@@ -196,6 +196,37 @@ int prompt_play_again() {
     return -1;
 }
 
+void display_end_message() {
+    int offset = 0, direction = 1;
+    
+    while (1) {
+        offset += direction;
+        
+        if (offset >= 1 || offset <= -1) {
+            direction = -direction;
+        }
+        
+        clrscr();
+        
+        draw_center_line();
+        
+        gotoxy(24 + offset, SCREEN_CENTER_Y);
+        
+        printf("o---------THAT'S_ALL---------o");
+        
+        gotoxy(25, 13);
+        printf("______________________________");
+        
+        gotoxy(29, 14);
+        printf("Thank you for playing!");
+        
+        gotoxy(30, 15);
+        printf("@algo-boy on github");
+        
+        delay(200);
+    }
+}
+
 int main() {
     int rope_length, rope_start, playing = 1, winner, player1_score = 0, player2_score = 0;
     char player1_key, player2_key;
@@ -237,5 +268,7 @@ int main() {
         }
     }
     
-    return 0;
+    display_end_message();
+    
+    //return 0;
 }
