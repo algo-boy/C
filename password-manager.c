@@ -45,7 +45,7 @@ int main() {
             case 'A':
                 add_account(&accounts[i]);
                 
-                printf("Account stored successfully.")
+                printf("Account stored successfully.");
                 
                 i++;
                 
