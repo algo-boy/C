@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <conio.h>
 #include <ctype.h>
+#include <string.h>
 
 typedef struct {
     char domain[20];
@@ -16,7 +17,6 @@ void display_menu(char *option) {
     printf("[E]XIT\n");
     
     *option = toupper(getch());
-    
 }
 
 void add_account(Account *account) {
@@ -32,6 +32,28 @@ void add_account(Account *account) {
     scanf("%s", account->password);
 }
 
+void retrieve_account(Account accounts[], int accounts_size) {
+    int i;
+    char domain[20];
+    
+    clrscr();
+    
+    printf("Enter domain: ");
+    scanf("%s", domain);
+    
+    for (i = 0; i < accounts_size; i++) {
+        if (strcmp(domain, accounts[i].domain) == 0) {
+            printf("Account found:\n");
+            printf("Domain: %s\n", accounts[i].domain);
+            printf("Name: %s\n", accounts[i].name);
+            printf("Password: %s\n", accounts[i].password);
+            return;
+        }
+    }
+    
+    printf("Account not found.\n");
+}
+
 int main() {
     Account accounts[128];
     
@@ -43,22 +65,20 @@ int main() {
         
         switch (option) {
             case 'A':
-                add_account(&accounts[i]);
-                
-                printf("Account stored successfully.");
-                
-                i++;
+                if (i < 128) {
+                    add_account(&accounts[i]);
+                    i++;
+                } else {
+                    printf("Account limit reached.\n");
+                }
                 
                 break;
                 
             case 'R':
-                
-                // Account retrieval goes here
-                
+                retrieve_account(accounts, i);
                 break;
                 
             case 'E':
-                printf("\nExiting...\n");
                 return 0;
                 
             default:
@@ -67,6 +87,4 @@ int main() {
         
         getch();
     }
-    
-    // return 0;
 }
