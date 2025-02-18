@@ -7,9 +7,20 @@ void main()
 {
     char board[8][8];
     
-    board[2][2] = 'K';
+    int r, f;
+    
+    // Initializes space character stored in each square
+    for (r = 0; r < 8; r++) {
+        for (f = 0; f < 8; f++) {
+            board[r][f] = ' ';
+        }
+    }
+    
+    board[0][0] = 'K'; // Knight dummy
     
     draw_board(board);
+    
+    getch();
 }
 
 void draw_board(char board[][8]) {
