@@ -23,13 +23,15 @@ void add_account(Account *account) {
     clrscr();
     
     printf("Enter domain: ");
-    scanf("%s", account->domain);
+    gets(account->domain);
     
     printf("Enter name: ");
-    scanf("%s", account->name);
+    gets(account->name);
     
     printf("Enter password: ");
-    scanf("%s", account->password);
+    gets(account->password);
+    
+    printf("Account stored successfully...\n");
 }
 
 void retrieve_account(Account accounts[], int accounts_size) {
@@ -45,7 +47,7 @@ void retrieve_account(Account accounts[], int accounts_size) {
         if (strcmp(domain, accounts[i].domain) == 0) {
             printf("Account found:\n");
             printf("Domain: %s\n", accounts[i].domain);
-            printf("Name: %s\n", accounts[i].name);
+            printf("Username: %s\n", accounts[i].name);
             printf("Password: %s\n", accounts[i].password);
             return;
         }
@@ -67,23 +69,25 @@ int main() {
             case 'A':
                 if (i < 128) {
                     add_account(&accounts[i]);
+                    
                     i++;
                 } else {
                     printf("Account limit reached.\n");
                 }
                 
                 break;
-                
             case 'R':
                 retrieve_account(accounts, i);
-                break;
                 
+                break;
             case 'E':
                 return 0;
                 
             default:
                 continue;
         }
+        
+        printf("Press any key to continue...");
         
         getch();
     }
