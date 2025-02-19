@@ -3,9 +3,12 @@
 
 void draw_board(char board[][8]);
 
+void get_starting_pos(int *x, int *y);
+
 void main()
 {
     char board[8][8];
+    int starting_pos_x = 0, starting_pos_y = 0;
     
     int r, f;
     
@@ -16,11 +19,26 @@ void main()
         }
     }
     
-    board[0][0] = 'K'; // Knight dummy
+    get_starting_pos(&starting_pos_x, &starting_pos_y);
+    
+    // printf("%d %d", starting_pos_x, starting_pos_y);
+    
+    board[starting_pos_x][starting_pos_y] = 'K'; // Knight dummy
     
     draw_board(board);
     
     getch();
+}
+
+void get_starting_pos(int *x, int *y) {
+    clrscr();
+    
+    printf("Enter starting position of the Knight (x y): ");
+    
+    scanf("%d %d", x, y);
+    
+    --*x;
+    --*y;
 }
 
 void draw_board(char board[][8]) {
