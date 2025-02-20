@@ -44,20 +44,25 @@ void draw_board(char board[][8]) {
     
     clrscr();
     
+    // Display file labels
+    gotoxy(27, 4);
+    printf("1   2   3   4   5   6   7   8");
+    
     for (r = 0; r < 8; r++) {
         int square_start_x = 25;
         
+        // Display rank labels
+        gotoxy(square_start_x - 2, square_start_y + 1);
+        printf("%d", r + 1);
+        
         for (f = 0; f < 8; f++) {
             gotoxy(square_start_x, square_start_y);
-            
             printf("+---+");
             
             gotoxy(square_start_x, square_start_y + 1);
-            
             printf("| %c |", board[r][f]);
             
             gotoxy(square_start_x, square_start_y + 2);
-            
             printf("+---+");
             
             square_start_x += 4;
