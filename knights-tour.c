@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <conio.h>
 
-void draw_board(char board[][8]);
+char board[8][8];
+
+void draw_board();
 
 void get_starting_pos(int *x, int *y);
 
@@ -9,7 +11,6 @@ void main()
 {
     int r, f, pos_x = 0, pos_y = 0, i;
     
-    char board[8][8];
     int moves_x[8] = {1, 2, 2, 1, -1, -2, -2, -1}, moves_y[8] = {-2, -1, 1, 2, 2, 1, -1, -2};
     
     // Initializes space character stored in each square
@@ -33,7 +34,7 @@ void main()
         }
     }
     
-    draw_board(board);
+    draw_board();
     
     getch();
 }
@@ -41,7 +42,7 @@ void main()
 void get_starting_pos(int *x, int *y) {
     clrscr();
     
-    printf("Enter starting position of the Knight (x y): ");
+    printf("Input starting position of the Knight (x y): ");
     
     scanf("%d %d", x, y);
     
@@ -49,7 +50,7 @@ void get_starting_pos(int *x, int *y) {
     --*y;
 }
 
-void draw_board(char board[][8]) {
+void draw_board() {
     int r, f, square_start_y = 5;
     
     clrscr();
