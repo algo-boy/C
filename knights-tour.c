@@ -43,7 +43,6 @@ void get_starting_pos(int *x, int *y) {
     clrscr();
     
     printf("Input starting position of the Knight (x y): ");
-    
     scanf("%d %d", x, y);
     
     --*x;
@@ -71,7 +70,7 @@ void draw_board() {
             printf("+---+");
             
             gotoxy(square_start_x, square_start_y + 1);
-            printf("| %c |", board[r][f]);
+            printf("| %c |", board[f][r]);
             
             gotoxy(square_start_x, square_start_y + 2);
             printf("+---+");
