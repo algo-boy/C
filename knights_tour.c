@@ -21,9 +21,7 @@ void main()
     
     get_starting_pos(&starting_pos_x, &starting_pos_y);
     
-    // printf("%d %d", starting_pos_x, starting_pos_y);
-    
-    board[starting_pos_x][starting_pos_y] = 'K'; // Knight dummy
+    board[starting_pos_x][starting_pos_y] = 'K';
     
     draw_board(board);
     
@@ -42,12 +40,12 @@ void get_starting_pos(int *x, int *y) {
 }
 
 void draw_board(char board[][8]) {
-    int r, f, square_start_y = 1;
+    int r, f, square_start_y = 5;
     
     clrscr();
     
     for (r = 0; r < 8; r++) {
-        int square_start_x = 1;
+        int square_start_x = 25;
         
         for (f = 0; f < 8; f++) {
             gotoxy(square_start_x, square_start_y);
