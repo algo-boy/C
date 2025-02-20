@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <conio.h>
+#include <math.h>
 
 void draw_board(char board[][8]);
 
@@ -8,9 +9,7 @@ void get_starting_pos(int *x, int *y);
 void main()
 {
     char board[8][8];
-    int starting_pos_x = 0, starting_pos_y = 0;
-    
-    int r, f;
+    int r, f, starting_pos_x = 0, starting_pos_y = 0, x, y;
     
     // Initializes space character stored in each square
     for (r = 0; r < 8; r++) {
@@ -22,6 +21,15 @@ void main()
     get_starting_pos(&starting_pos_x, &starting_pos_y);
     
     board[starting_pos_x][starting_pos_y] = 'K';
+    
+    // Mark possible moves
+    for (x = -2; x <= 2; x++) {
+        for (y = -2; y <= 2; y++) {
+            if (abs(x) != abs(y) && x != 0 && y != 0) {
+                board[starting_pos_x + x][starting_pos_y + y] = 'o';
+            }
+        }
+    }
     
     draw_board(board);
     
