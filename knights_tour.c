@@ -22,7 +22,7 @@ void main()
     
     board[starting_pos_x][starting_pos_y] = 'K';
     
-    // Mark possible moves
+    // Mark available moves
     for (x = -2; x <= 2; x++) {
         for (y = -2; y <= 2; y++) {
             if (abs(x) != abs(y) && x != 0 && y != 0) {
@@ -52,14 +52,14 @@ void draw_board(char board[][8]) {
     
     clrscr();
     
-    // Display file labels
+    // Displays file labels
     gotoxy(27, 4);
     printf("1   2   3   4   5   6   7   8");
     
     for (r = 0; r < 8; r++) {
         int square_start_x = 25;
         
-        // Display rank labels
+        // Displays rank labels
         gotoxy(square_start_x - 2, square_start_y + 1);
         printf("%d", r + 1);
         
