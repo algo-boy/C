@@ -1,52 +1,76 @@
 #include <stdio.h>
 #include <conio.h>
+#include <math.h>
 
 char board[8][8];
+int last_x, last_y;
 
 void draw_board();
-
-void get_starting_pos(int *x, int *y);
+void clear_board();
+void get_starting_pos();
+void get_move();
 
 void main()
 {
-    int r, f, pos_x = 0, pos_y = 0, i;
+    int r, f;
     
-    int moves_x[8] = {1, 2, 2, 1, -1, -2, -2, -1}, moves_y[8] = {-2, -1, 1, 2, 2, 1, -1, -2};
+    clear_board();
     
-    // Initializes space character stored in each square
+    get_starting_pos();
+    
+    getch();
+}
+
+void get_move() {
+    int x, y;
+    
+    board[last_x][last_y] = 'x';
+    
+    while (abs(last_x - x) + abs(last_y - y) != 3) {
+        gotoxy(1, 1);
+        
+        printf("Input next position of the Knight (x y): ");
+        scanf("%d %d", &x, &y);
+        
+        --x;
+        --y;
+    }
+    
+    board[x][y] = 'K';
+    
+    last_x = x;
+    last_y = y;
+    
+    draw_board();
+}
+
+void get_starting_pos() {
+    int x, y;
+    
+    clrscr();
+    
+    printf("Input starting position of the Knight (x y): ");
+    scanf("%d %d", &x, &y);
+    
+    --x;
+    --y;
+    
+    board[x][y] = 'K';
+    
+    last_x = x;
+    last_y = y;
+    
+    draw_board();
+}
+
+void clear_board() {
+    int r, f;
+    
     for (r = 0; r < 8; r++) {
         for (f = 0; f < 8; f++) {
             board[r][f] = ' ';
         }
     }
-    
-    get_starting_pos(&pos_x, &pos_y);
-    
-    board[pos_x][pos_y] = 'K';
-    
-    // Mark available moves
-    for (i = 0; i < 8; i++) {
-        int move_x = pos_x + moves_x[i];
-        int move_y = pos_y + moves_y[i];
-        
-        if (move_x >= 0 && move_y >= 0 && move_x < 8 && move_y < 8) {
-            board[move_x][move_y] = 'o';
-        }
-    }
-    
-    draw_board();
-    
-    getch();
-}
-
-void get_starting_pos(int *x, int *y) {
-    clrscr();
-    
-    printf("Input starting position of the Knight (x y): ");
-    scanf("%d %d", x, y);
-    
-    --*x;
-    --*y;
 }
 
 void draw_board() {
@@ -80,4 +104,6 @@ void draw_board() {
         
         square_start_y += 2;
     }
+    
+    get_move();
 }
