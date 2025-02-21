@@ -3,7 +3,8 @@
 #include <math.h>
 
 char board[8][8];
-int last_x, last_y;
+int last_x = 0, last_y; /* last_x initialized to 0 to be used as a condition in the
+                        recursive sequence of get_move() and get_starting_pos() */
 
 void draw_board();
 void clear_board();
@@ -16,7 +17,7 @@ void main()
     
     clear_board();
     
-    get_starting_pos();
+    draw_board();
     
     getch();
 }
@@ -27,10 +28,7 @@ void get_move() {
     board[last_x][last_y] = 'x';
     
     while ((abs(last_x - x) + abs(last_y - y) != 3) || (x < 0 || y < 0 || x >= 8 || y >= 8) || (board[x][y] == 'x')) {
-        gotoxy(1, 1);
-        printf("                                                                                ");
-        
-        gotoxy(1, 1);
+        gotoxy(2, 2);
         printf("Input next position of the knight (x y): ");
         scanf("%d %d", &x, &y);
         
@@ -38,13 +36,13 @@ void get_move() {
         --y;
         
         if (abs(last_x - x) + abs(last_y - y) != 3) {
-            gotoxy(1, 1);
+            gotoxy(2, 2);
             printf("Invalid knight move. ");
         } else if (x < 0 || y < 0 || x >= 8 || y >= 8) {
-            gotoxy(1, 1);
-            printf("Knight move out of bounds. ");
+            gotoxy(2, 2);
+            printf("Move out of bounds. ");
         } else if ((board[x][y] == 'x')) {
-            gotoxy(1, 1);
+            gotoxy(2, 2);
             printf("Square has been visited. ");
         } else {
             break;
@@ -53,6 +51,9 @@ void get_move() {
         printf("Press any key to try again.");
         
         getch();
+        
+        gotoxy(2, 2);
+        printf("                                                                                ");
     }
     
     board[x][y] = 'K';
@@ -66,8 +67,7 @@ void get_move() {
 void get_starting_pos() {
     int x, y;
     
-    clrscr();
-    
+    gotoxy(2, 2);
     printf("Input starting position of the Knight (x y): ");
     scanf("%d %d", &x, &y);
     
@@ -124,5 +124,9 @@ void draw_board() {
         square_start_y += 2;
     }
     
-    get_move();
+    if (last_x == 0) {
+        get_starting_pos();
+    } else {
+        get_move();
+    }
 }
