@@ -26,7 +26,7 @@ void get_move() {
     
     board[last_x][last_y] = 'x';
     
-    while (abs(last_x - x) + abs(last_y - y) != 3) {
+    while ((abs(last_x - x) + abs(last_y - y) != 3) || (x < 0 || y < 0 || x >= 8 || y >= 8) || (board[x][y] == 'x')) {
         gotoxy(1, 1);
         
         printf("Input next position of the Knight (x y): ");
