@@ -28,12 +28,31 @@ void get_move() {
     
     while ((abs(last_x - x) + abs(last_y - y) != 3) || (x < 0 || y < 0 || x >= 8 || y >= 8) || (board[x][y] == 'x')) {
         gotoxy(1, 1);
+        printf("                                                                                ");
         
-        printf("Input next position of the Knight (x y): ");
+        gotoxy(1, 1);
+        printf("Input next position of the knight (x y): ");
         scanf("%d %d", &x, &y);
         
         --x;
         --y;
+        
+        if (abs(last_x - x) + abs(last_y - y) != 3) {
+            gotoxy(1, 1);
+            printf("Invalid knight move. ");
+        } else if (x < 0 || y < 0 || x >= 8 || y >= 8) {
+            gotoxy(1, 1);
+            printf("Knight move out of bounds. ");
+        } else if ((board[x][y] == 'x')) {
+            gotoxy(1, 1);
+            printf("Square has been visited. ");
+        } else {
+            break;
+        }
+        
+        printf("Press any key to try again.");
+        
+        getch();
     }
     
     board[x][y] = 'K';
