@@ -3,13 +3,12 @@
 #include <math.h>
 
 char board[8][8];
-int last_x, last_y;
+int last_x = -1, last_y = -1;
 int initialized = 0;
 
 void draw_board();
 void clear_board();
-void get_starting_pos();
-void get_move();
+void get_position();
 
 void main()
 {
@@ -22,20 +21,26 @@ void main()
     getch();
 }
 
-void get_move() {
+void get_position() {
     int x, y;
     
     board[last_x][last_y] = 'x';
     
     while (1) {
         gotoxy(2, 2);
-        printf("Input next position of the knight (x y): ");
+        
+        if (initialized) {
+            printf("Input next position of the knight (x y): ");
+        } else {
+            printf("Input starting position of the knight (x y): ");
+        }
+        
         scanf("%d %d", &x, &y);
         
         --x;
         --y;
         
-        if (abs(last_x - x) + abs(last_y - y) != 3) {
+        if ((abs(last_x - x) + abs(last_y - y) != 3) && initialized) {
             gotoxy(2, 2);
             printf("Invalid knight move. ");
         } else if (x < 0 || y < 0 || x >= 8 || y >= 8) {
@@ -45,6 +50,8 @@ void get_move() {
             gotoxy(2, 2);
             printf("Square has been visited. ");
         } else {
+            initialized = 1;
+            
             break;
         }
         
@@ -124,11 +131,5 @@ void draw_board() {
         square_start_y += 2;
     }
     
-    if (initialized == 0) {
-        initialized = 1;
-        
-        get_starting_pos();
-    } else {
-        get_move();
-    }
+    get_position();
 }
