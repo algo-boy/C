@@ -3,8 +3,8 @@
 #include <math.h>
 
 char board[8][8];
-int last_x = 0, last_y; /* last_x initialized to 0 to be used as a condition in the
-                        recursive sequence of get_move() and get_starting_pos() */
+int last_x, last_y;
+int initialized = 0;
 
 void draw_board();
 void clear_board();
@@ -27,7 +27,7 @@ void get_move() {
     
     board[last_x][last_y] = 'x';
     
-    while ((abs(last_x - x) + abs(last_y - y) != 3) || (x < 0 || y < 0 || x >= 8 || y >= 8) || (board[x][y] == 'x')) {
+    while (1) {
         gotoxy(2, 2);
         printf("Input next position of the knight (x y): ");
         scanf("%d %d", &x, &y);
@@ -124,7 +124,9 @@ void draw_board() {
         square_start_y += 2;
     }
     
-    if (last_x == 0) {
+    if (initialized == 0) {
+        initialized = 1;
+        
         get_starting_pos();
     } else {
         get_move();
