@@ -3,8 +3,8 @@
 #include <math.h>
 
 char board[8][8];
-int last_x = -1, last_y = -1;
-int initialized = 0;
+int last_x, last_y;
+int started = 0;
 
 void draw_board();
 void clear_board();
@@ -22,14 +22,16 @@ void main()
 }
 
 void get_position() {
-    int x, y;
+    int x, y, i, j, available_moves = 0;
     
-    board[last_x][last_y] = 'x';
+    if (started) {
+        board[last_x][last_y] = 'x';
+    }
     
     while (1) {
         gotoxy(2, 2);
         
-        if (initialized) {
+        if (started) {
             printf("Input next position of the knight (x y): ");
         } else {
             printf("Input starting position of the knight (x y): ");
@@ -40,7 +42,7 @@ void get_position() {
         --x;
         --y;
         
-        if ((abs(last_x - x) + abs(last_y - y) != 3) && initialized) {
+        if ((abs(last_x - x) + abs(last_y - y) != 3) && started) {
             gotoxy(2, 2);
             printf("Invalid knight move. ");
         } else if (x < 0 || y < 0 || x >= 8 || y >= 8) {
@@ -50,7 +52,7 @@ void get_position() {
             gotoxy(2, 2);
             printf("Square has been visited. ");
         } else {
-            initialized = 1;
+            started = 1;
             
             break;
         }
@@ -64,6 +66,16 @@ void get_position() {
     }
     
     board[x][y] = 'K';
+    
+    for (i = -2; i <= 2; i++) {
+        for (j = -2; j <= 2; j++) {
+            if ((abs(i) != abs(j)) && (i != 0 && j != 0)
+                && (x + i >= 0 && x + i < 8 && y + j >= 0 && y + j < 8)
+                && (board[x + i][y + j] != 'x')) {
+                available_moves++;
+            }
+        }
+    }
     
     last_x = x;
     last_y = y;
