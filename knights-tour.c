@@ -32,9 +32,9 @@ void get_position() {
         gotoxy(2, 2);
         
         if (started) {
-            printf("Input next position of the knight (x y): ");
+            printf("| Input next position of the knight (x y): ");
         } else {
-            printf("Input starting position of the knight (x y): ");
+            printf("| Input starting position of the knight (x y): ");
         }
         
         scanf("%d %d", &x, &y);
@@ -44,13 +44,13 @@ void get_position() {
         
         if ((abs(last_x - x) + abs(last_y - y) != 3) && started) {
             gotoxy(2, 2);
-            printf("Invalid knight move. ");
+            printf("| Invalid knight move. ");
         } else if (x < 0 || y < 0 || x >= 8 || y >= 8) {
             gotoxy(2, 2);
-            printf("Move out of bounds. ");
+            printf("| Position out of bounds. ");
         } else if ((board[x][y] == 'x')) {
             gotoxy(2, 2);
-            printf("Square has been visited. ");
+            printf("| Square has been visited. ");
         } else {
             started = 1;
             
@@ -76,24 +76,6 @@ void get_position() {
             }
         }
     }
-    
-    last_x = x;
-    last_y = y;
-    
-    draw_board();
-}
-
-void get_starting_pos() {
-    int x, y;
-    
-    gotoxy(2, 2);
-    printf("Input starting position of the Knight (x y): ");
-    scanf("%d %d", &x, &y);
-    
-    --x;
-    --y;
-    
-    board[x][y] = 'K';
     
     last_x = x;
     last_y = y;
