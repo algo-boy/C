@@ -9,16 +9,63 @@ int started = 0;
 void draw_board();
 void clear_board();
 void get_position();
+void display_intro_screen();
 
 void main()
 {
     int r, f;
+    
+    display_intro_screen();
+    
+    getch();
     
     clear_board();
     
     draw_board();
     
     getch();
+}
+
+void display_intro_screen() {
+    clrscr();
+    
+    gotoxy(35, 7);
+    printf("   (\\=,\n");
+    
+    gotoxy(35, 8);
+    printf("  //  .\\\n");
+    
+    gotoxy(35, 9);
+    printf(" (( \\_  \\\n");
+    
+    gotoxy(35, 10);
+    printf("  ))  `\\_)\n");
+    
+    gotoxy(35, 11);
+    printf(" (/     |\n");
+    
+    gotoxy(35, 12);
+    printf("  \\_.- /\n");
+    
+    gotoxy(35, 13);
+    printf("  )___(\n");
+    
+    gotoxy(35, 14);
+    printf(" (=====)\n");
+    
+    gotoxy(35, 15);
+    printf(" }====={\n");
+    
+    gotoxy(35, 16);
+    printf("(_______)\n");
+    
+    gotoxy(33, 18);
+    printf("Knight's Tour");
+    
+    gotoxy(27, 20);
+    printf("[ PRESS ANY KEY TO START ]");
+    
+    gotoxy(80, 25);
 }
 
 void get_position() {
