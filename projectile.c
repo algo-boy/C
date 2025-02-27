@@ -1,245 +1,187 @@
-// Header Files
 #include <stdio.h>
 #include <conio.h>
 #include <math.h>
-#include <dos.h>
-#include <ctype.h>
 
-// Screen Dimensions
-#define SCREEN_WIDTH 80
-#define SCREEN_HEIGHT 25
+#define HIDE_CURSOR gotoxy(80, 25)
 
-// Physical Constants
-#define TIME_STEP 0.01
-#define GROUND_Y 24
-#define INITIAL_X 2
-#define TARGET_X 40
+char board[8][8];
+int last_x, last_y;
+int started = 0;
 
-// Mathematical Constants
-#define PI 3.1416
-#define G 9.81
+void draw_board(int available_moves);
+void clear_board();
+void get_position();
+void display_intro_screen();
 
-// Macro Definition
-#define HIDE_CURSOR gotoxy(SCREEN_WIDTH, SCREEN_HEIGHT) // Moves cursor to the bottom-right corner of the screen
-
-void clear_line(int y) {
-    int i;
+void main()
+{
+    int r, f;
     
-    gotoxy(1, y);
+    display_intro_screen();
     
-    for (i = 1; i <= SCREEN_WIDTH - 1; i++) { // SCREEN_WIDTH - 1 to prevent overflow into the next line
-        putchar(' ');
-    }
+    getch();
+    
+    clear_board();
+    
+    draw_board(1); // Dummy argument
+    
+    getch();
 }
 
-void display_title_screen() {
+void display_intro_screen() {
     clrscr();
     
-    gotoxy(1, 9);
-    printf("                          ________           ________________\n");
-    printf("     ___________________________(_)____________  /___(_)__  /____   _______\n");
-    printf("     ___  __ \\_  ___/  __ \\____  /_  _ \\  ___/  __/_  /__  /_  _ \\  _  ___/\n");
-    printf("     __  /_/ /  /   / /_/ /___  / /  __/ /__ / /_ _  / _  / /  __/__/ /__\n");
-    printf("     _  .___//_/    \\____/___  /  \\___/\\___/ \\__/ /_/  /_/  \\___/_(_)___/\n");
-    printf("     /_/                  /___/\n");
+    gotoxy(35, 7);
+    printf("   (\\=,\n");
     
-    gotoxy(27, 16);
+    gotoxy(35, 8);
+    printf("  //  .\\\n");
+    
+    gotoxy(35, 9);
+    printf(" (( \\_  \\\n");
+    
+    gotoxy(35, 10);
+    printf("  ))  `\\_)\n");
+    
+    gotoxy(35, 11);
+    printf(" (/     |\n");
+    
+    gotoxy(35, 12);
+    printf("  \\_.- /\n");
+    
+    gotoxy(35, 13);
+    printf("  )___(\n");
+    
+    gotoxy(35, 14);
+    printf(" (=====)\n");
+    
+    gotoxy(35, 15);
+    printf(" }====={\n");
+    
+    gotoxy(35, 16);
+    printf("(_______)\n");
+    
+    gotoxy(33, 18);
+    printf("Knight's Tour");
+    
+    gotoxy(27, 20);
     printf("[ PRESS ANY KEY TO START ]");
     
     HIDE_CURSOR;
-    
-    getch();
 }
 
-void draw_environment() {
-    int x;
+void get_position() {
+    int x, y, i, j, available_moves = 0;
     
-    clrscr();
+    if (started) {
+        board[last_x][last_y] = 'x';
+    }
     
-    for (x = 1; x <= SCREEN_WIDTH; x++) {
-        gotoxy(x, GROUND_Y);
+    while (1) {
+        gotoxy(2, 2);
         
-        if (x == TARGET_X) {
-            printf("O");
-        } else if (x == INITIAL_X) {
-            printf("o");
+        if (started) {
+            printf("| Input next position of the knight (x y): ");
         } else {
-            printf("_");
+            printf("| Input starting position of the knight (x y): ");
         }
-    }
-}
-
-void get_initial_conditions(float *v_0, float *theta) {
-    gotoxy(2, 2);
-    printf("____________INPUTS____________");
-    
-    gotoxy(2, 5);
-    printf("______________________________");
-    
-    // Gets and validates v_0
-    while (1) {
-        gotoxy(2, 3);
-        printf("Enter initial velocity: ");
         
-        if (scanf("%f", v_0) != 1 || *v_0 <= 0) {
-            gotoxy(10, SCREEN_HEIGHT);
-            printf("Initial velocity must be a positive number. Press any key to continue.");
-            
-            getch();
-            
-            clear_line(3);
-            clear_line(SCREEN_HEIGHT);
-            
-            fflush(stdin); // Flush recent input from the buffer
-        } else break;
-    }
-    
-    // Gets and validates theta
-    while (1) {
-        gotoxy(2, 4);
-        printf("Enter launch angle: ");
+        scanf("%d %d", &x, &y);
         
-        if (scanf("%f", theta) != 1 || *theta < 1 || *theta > 180) {
-            gotoxy(6, SCREEN_HEIGHT);
-            printf("Launch angle must be between 1 and 180 degrees. Press any key to continue.");
-            
-            getch();
-            
-            clear_line(4);
-            clear_line(SCREEN_HEIGHT);
-            
-            fflush(stdin);
-        } else break;
-    }
-}
-
-void compute_results(float v_0, float theta, float *v_x0, float *v_y0, float *T, float *R, float *H) {
-    float cos_theta, sin_theta;
-    
-    theta *= PI / 180.0; // Converts degrees into radians
-    
-    // Caches values for efficiency
-    cos_theta = cos(theta);
-    sin_theta = sin(theta);
-    
-    *v_x0 = v_0 * cos_theta;
-    *v_y0 = v_0 * sin_theta;
-    
-    *T = 2 * v_0 * sin_theta / G;
-    *R = v_0 * v_0 * sin(2 * theta) / G;
-    *H = v_0 * v_0 * (sin_theta) * (sin_theta) / (2 * G);
-}
-
-void display_results(float v_x0, float v_y0, float T, float R, float H) {
-    gotoxy(35, 2);
-    printf("___________________RESULTS___________________");
-    
-    gotoxy(35, 3);
-    printf("Initial Horizontal Velocity:\t%0.2f m/s", v_x0);
-    
-    gotoxy(35, 4);
-    printf("Initial Vertical Velocity:\t%0.2f m/s", v_y0);
-    
-    gotoxy(35, 5);
-    printf("Time of Flight:\t\t%0.2f seconds", T);
-    
-    gotoxy(35, 6);
-    printf("Range:\t\t\t%0.2f meters", R);
-    
-    gotoxy(35, 7);
-    printf("Maximum Height:\t\t%0.2f meters", H);
-    
-    gotoxy(35, 8);
-    printf("_____________________________________________");
-    
-    gotoxy(22, GROUND_Y / 2);
-    printf("[ PRESS ANY KEY TO PLAY TRAJECTORY ]");
-    
-    HIDE_CURSOR;
-    
-    getch();
-}
-
-void draw_trajectory(float T, float v_x0, float v_y0) {
-    float t;
-    int x, y;
-    
-    clear_line(GROUND_Y / 2);
-    
-    // Animates projectile trajectory
-    for (t = 0; t <= T; t += TIME_STEP) {
-        int offset_x, inverted_y;
+        --x;
+        --y;
         
-        x = v_x0 * t;
-        y = v_y0 * t - 0.5 * G * t * t;
-        
-        offset_x = x + INITIAL_X; // Offsets x by INITIAL_X for correct screen display
-        inverted_y = GROUND_Y - y; // Inverts y for correct screen display
-        
-        // Plots trajectory point in bounds
-        if (offset_x >= 1 && offset_x <= SCREEN_WIDTH && inverted_y >= 1 && inverted_y <= GROUND_Y) {
-            gotoxy(offset_x, inverted_y);
-            printf("o");
-        } else if (offset_x < 1 || offset_x > SCREEN_WIDTH) {
-            gotoxy(23, SCREEN_HEIGHT);
-            printf("Trajectory exceeded horizontal bounds.");
+        if ((abs(last_x - x) + abs(last_y - y) != 3) && started) {
+            gotoxy(2, 2);
+            printf("| Invalid knight move. ");
+        } else if (x < 0 || y < 0 || x >= 8 || y >= 8) {
+            gotoxy(2, 2);
+            printf("| Position out of bounds. ");
+        } else if ((board[x][y] == 'x')) {
+            gotoxy(2, 2);
+            printf("| Square has been visited. ");
+        } else {
+            started = 1;
             
             break;
         }
         
-        // Detects target hit
-        if (offset_x == TARGET_X && inverted_y == GROUND_Y) {
-            gotoxy(TARGET_X + 2, GROUND_Y - 2);
-            printf("You hit the target!");
-        }
+        printf("Press any key to try again.");
         
-        delay(10);
+        getch();
+        
+        gotoxy(2, 2);
+        printf("                                                                                ");
+    }
+    
+    board[x][y] = 'K';
+    
+    for (i = -2; i <= 2; i++) {
+        for (j = -2; j <= 2; j++) {
+            if ((abs(i) != abs(j)) && (i != 0 && j != 0)
+                && (x + i >= 0 && x + i < 8 && y + j >= 0 && y + j < 8)
+                && (board[x + i][y + j] != 'x')) {
+                available_moves++;
+            }
+        }
+    }
+    
+    last_x = x;
+    last_y = y;
+    
+    draw_board(available_moves);
+}
+
+void clear_board() {
+    int r, f;
+    
+    for (r = 0; r < 8; r++) {
+        for (f = 0; f < 8; f++) {
+            board[r][f] = ' ';
+        }
     }
 }
 
-int get_retry_option() {
-    char option;
+void draw_board(int available_moves) {
+    int r, f, square_start_y = 5;
     
-    while (option != 'R' && option != 'X') {
-        gotoxy(62, SCREEN_HEIGHT);
-        printf("[R] Retry [X] Quit");
+    clrscr();
+    
+    // Displays file labels
+    gotoxy(27, 4);
+    printf("1   2   3   4   5   6   7   8");
+    
+    for (r = 0; r < 8; r++) {
+        int square_start_x = 25;
         
-        option = toupper(getch());
+        // Displays rank labels
+        gotoxy(square_start_x - 2, square_start_y + 1);
+        printf("%d", r + 1);
         
-        if (option == 'R') {
-            return 1;
-        } else if (option == 'X') {
-            return 0;
-        } else {
-            clear_line(SCREEN_HEIGHT);
+        for (f = 0; f < 8; f++) {
+            gotoxy(square_start_x, square_start_y);
+            printf("+---+");
             
-            gotoxy(47, SCREEN_HEIGHT);
-            printf("Invalid input.");
+            gotoxy(square_start_x, square_start_y + 1);
+            printf("| %c |", board[f][r]);
+            
+            gotoxy(square_start_x, square_start_y + 2);
+            printf("+---+");
+            
+            square_start_x += 4;
         }
+        
+        square_start_y += 2;
     }
     
-    return -1; // Does nothing but fulfill compiler's wish
-}
-
-int main() {
-    float v_0, theta, v_x0, v_y0, T, R, H;
-    int will_repeat = 1;
-    
-    display_title_screen();
-    
-    while (will_repeat) {
-        draw_environment();
+    if (!available_moves) {
+        gotoxy(2, 2);
+        printf("| No available moves left. Better luck next time.");
         
-        get_initial_conditions(&v_0, &theta);
+        HIDE_CURSOR;
         
-        compute_results(v_0, theta, &v_x0, &v_y0, &T, &R, &H);
-        
-        display_results(v_x0, v_y0, T, R, H);
-        
-        draw_trajectory(T, v_x0, v_y0);
-        
-        will_repeat = get_retry_option();
+        return;
     }
     
-    return 0;
+    get_position();
 }
