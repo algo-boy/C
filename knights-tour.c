@@ -2,11 +2,13 @@
 #include <conio.h>
 #include <math.h>
 
+#define HIDE_CURSOR gotoxy(80, 25)
+
 char board[8][8];
 int last_x, last_y;
 int started = 0;
 
-void draw_board();
+void draw_board(int available_moves);
 void clear_board();
 void get_position();
 void display_intro_screen();
@@ -21,7 +23,7 @@ void main()
     
     clear_board();
     
-    draw_board();
+    draw_board(1); // Dummy argument
     
     getch();
 }
@@ -65,7 +67,7 @@ void display_intro_screen() {
     gotoxy(27, 20);
     printf("[ PRESS ANY KEY TO START ]");
     
-    gotoxy(80, 25);
+    HIDE_CURSOR;
 }
 
 void get_position() {
@@ -127,7 +129,7 @@ void get_position() {
     last_x = x;
     last_y = y;
     
-    draw_board();
+    draw_board(available_moves);
 }
 
 void clear_board() {
@@ -140,7 +142,7 @@ void clear_board() {
     }
 }
 
-void draw_board() {
+void draw_board(int available_moves) {
     int r, f, square_start_y = 5;
     
     clrscr();
@@ -170,6 +172,15 @@ void draw_board() {
         }
         
         square_start_y += 2;
+    }
+    
+    if (!available_moves) {
+        gotoxy(2, 2);
+        printf("| No available moves left. Better luck next time.");
+        
+        HIDE_CURSOR;
+        
+        return;
     }
     
     get_position();
