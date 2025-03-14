@@ -6,7 +6,7 @@
 
 char board[8][8];
 int last_x, last_y;
-int started = 0;
+int moves = 0;
 
 void draw_board(int available_moves);
 void clear_board();
@@ -73,14 +73,14 @@ void display_intro_screen() {
 void get_position() {
     int x, y, i, j, available_moves = 0;
     
-    if (started) {
+    if (moves) {
         board[last_x][last_y] = 'x';
     }
     
     while (1) {
         gotoxy(2, 2);
         
-        if (started) {
+        if (moves) {
             printf("| Input next position of the knight (x y): ");
         } else {
             printf("| Input starting position of the knight (x y): ");
@@ -91,7 +91,7 @@ void get_position() {
         --x;
         --y;
         
-        if ((abs(last_x - x) + abs(last_y - y) != 3) && started) {
+        if ((abs(last_x - x) + abs(last_y - y) != 3) && moves) {
             gotoxy(2, 2);
             printf("| Invalid knight move. ");
         } else if (x < 0 || y < 0 || x >= 8 || y >= 8) {
@@ -101,12 +101,14 @@ void get_position() {
             gotoxy(2, 2);
             printf("| Square has been visited. ");
         } else {
-            started = 1;
+            moves++;
             
             break;
         }
         
         printf("Press any key to try again.");
+        
+        HIDE_CURSOR;
         
         getch();
         
@@ -174,9 +176,16 @@ void draw_board(int available_moves) {
         square_start_y += 2;
     }
     
+    printf("%d", moves); // TEST PRINT
+    
     if (!available_moves) {
         gotoxy(2, 2);
-        printf("| No available moves left. Better luck next time.");
+        
+        if (moves == 64) {
+            printf("| You have successfully completed the knight's tour. Congratulations!");
+        } else {
+            printf("| No available moves left. Better luck next time.");
+        }
         
         HIDE_CURSOR;
         
