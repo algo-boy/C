@@ -5,8 +5,7 @@
 #define HIDE_CURSOR gotoxy(80, 25)
 
 char board[8][8];
-int first_x, first_y, last_x, last_y;
-int moves = 0, solving = 0;
+int first_x, first_y, last_x, last_y, moves = 0, solving = 0;
 
 void draw_board(int available_moves);
 void clear_board();
@@ -24,70 +23,88 @@ void main()
     
     clear_board();
     
-    draw_board(1); // Dummy argument
+    draw_board(-1); // Dummy argument
     
     getch();
 }
 
 void play_solution() {
-    int x, y, i, j, k, l;
-    int fewest_moves = 9; // Idk
+    int current_x, current_y;
     
     if (!moves) {
         board[first_x][first_y] = 'K';
         
-        x = first_x;
-        y = first_y;
-    } else {
+        current_x = first_x;
+        current_y = first_y;
+    } else if (moves < 64) {
+        int i, j, best_x, best_y, fewest_moves = 9;
+        
         board[last_x][last_y] = 'x';
         
-        x = last_x;
-        y = last_y;
-    }
-    
-    // Traverse through all current valid knight moves
-    for (i = -2; i <= 2; i++) {
-        for (j = -2; j <= 2; j++) {
-            int move_x = x + i;
-            int move_y = y + j;
-            int available_moves = 0;
-            
-            if ((abs(i) != abs(j)) && (i != 0 && j != 0)
-                && (move_x >= 0 && move_x < 8 && move_y >= 0 && move_y < 8)
-                && (board[move_x][move_y] != 'x')) {
+        current_x = last_x;
+        current_y = last_y;
+        
+        // Traverse through all current valid knight moves
+        for (i = -2; i <= 2; i++) {
+            for (j = -2; j <= 2; j++) {
+                int move_x = current_x + i;
+                int move_y = current_y + j;
+                int available_moves = 0;
                 
-                // Traverse through all next valid knight moves for each current knight move
-                for (k = -2; k <= 2; k++) {
-                    for (l = -2; l <= 2; l++) {
-                        int next_x = move_x + k;
-                        int next_y = move_y + l;
-                        
-                        if ((abs(i) != abs(j)) && (i != 0 && j != 0)
-                            && (next_x >= 0 && next_x < 8 && next_y >= 0 && next_y < 8)
-                            && (board[next_x][next_y] != 'x')) {
-                            available_moves++;
+                if ((abs(i) != abs(j)) && (i != 0 && j != 0)
+                    && (move_x >= 0 && move_x < 8 && move_y >= 0 && move_y < 8)
+                    && (board[move_x][move_y] != 'x')) {
+                    int k, l;
+                    
+                    // Traverse through all next valid knight moves
+                    for (k = -2; k <= 2; k++) {
+                        for (l = -2; l <= 2; l++) {
+                            int next_x = move_x + k;
+                            int next_y = move_y + l;
+                            
+                            if ((abs(k) != abs(l)) && (k != 0 && l != 0)
+                                && (next_x >= 0 && next_x < 8 && next_y >= 0 && next_y < 8)
+                                && (board[next_x][next_y] != 'x')) {
+                                available_moves++;
+                            }
                         }
+                    }
+                    
+                    if (available_moves < fewest_moves) {
+                        fewest_moves = available_moves;
+                        
+                        best_x = move_x;
+                        best_y = move_y;
                     }
                 }
             }
-            
-            if (available_moves < fewest_moves) {
-                fewest_moves = available_moves;
-                
-                x = move_x;
-                y = move_y;
-            }
         }
+        
+        current_x = best_x;
+        current_y = best_y;
+        
+        board[best_x][best_y] = 'K';
+    } else {
+        solving = 0;
+        
+        gotoxy(2, 2);
+        printf("| The Knight's tour has been completed.");
+        
+        HIDE_CURSOR;
+        
+        getch();
+        
+        return;
     }
     
-    board[x][y] = 'K';
+    moves++;
     
-    last_x = x;
-    last_y = x;
+    last_x = current_x;
+    last_y = current_y;
     
-    delay(1000);
+    delay(500);
     
-    draw_board(1);
+    draw_board(-1); // Dummy argument, not necessary to pass anything
 }
 
 void display_intro_screen() {
@@ -246,6 +263,8 @@ void draw_board(int available_moves) {
         square_start_y += 2;
     }
     
+    HIDE_CURSOR;
+    
     if (!available_moves) {
         gotoxy(2, 2);
         
@@ -263,22 +282,21 @@ void draw_board(int available_moves) {
             
             HIDE_CURSOR;
             
-            option = getch();
+            while (option != '1' && option != '0') {
+                option = getch();
+            }
             
-            while (option != '1' || option != '0') {
-                switch (option) {
-                    case '1':
-                        clear_board();
-                        
-                        moves = 0; // Repurpose of variable
-                        solving = 1;
-                        
-                        play_solution();
-                        
-                        break;
-                    case '0':
-                        return;
-                }
+            switch (option) {
+                case '1':
+                    clear_board();
+                    
+                    moves = 0; // Repurpose of variable
+                    
+                    solving = 1;
+                    
+                    break;
+                case '0':
+                    return;
             }
         }
     }
