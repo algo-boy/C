@@ -5,13 +5,14 @@
 #define HIDE_CURSOR gotoxy(80, 25)
 
 char board[8][8];
-int last_x, last_y;
-int moves = 0;
+int first_x, first_y, last_x, last_y;
+int moves = 0, solving = 0;
 
 void draw_board(int available_moves);
 void clear_board();
 void get_position();
 void display_intro_screen();
+void play_solution();
 
 void main()
 {
@@ -26,6 +27,67 @@ void main()
     draw_board(1); // Dummy argument
     
     getch();
+}
+
+void play_solution() {
+    int x, y, i, j, k, l;
+    int fewest_moves = 9; // Idk
+    
+    if (!moves) {
+        board[first_x][first_y] = 'K';
+        
+        x = first_x;
+        y = first_y;
+    } else {
+        board[last_x][last_y] = 'x';
+        
+        x = last_x;
+        y = last_y;
+    }
+    
+    // Traverse through all current valid knight moves
+    for (i = -2; i <= 2; i++) {
+        for (j = -2; j <= 2; j++) {
+            int move_x = x + i;
+            int move_y = y + j;
+            int available_moves = 0;
+            
+            if ((abs(i) != abs(j)) && (i != 0 && j != 0)
+                && (move_x >= 0 && move_x < 8 && move_y >= 0 && move_y < 8)
+                && (board[move_x][move_y] != 'x')) {
+                
+                // Traverse through all next valid knight moves for each current knight move
+                for (k = -2; k <= 2; k++) {
+                    for (l = -2; l <= 2; l++) {
+                        int next_x = move_x + k;
+                        int next_y = move_y + l;
+                        
+                        if ((abs(i) != abs(j)) && (i != 0 && j != 0)
+                            && (next_x >= 0 && next_x < 8 && next_y >= 0 && next_y < 8)
+                            && (board[next_x][next_y] != 'x')) {
+                            available_moves++;
+                        }
+                    }
+                }
+            }
+            
+            if (available_moves < fewest_moves) {
+                fewest_moves = available_moves;
+                
+                x = move_x;
+                y = move_y;
+            }
+        }
+    }
+    
+    board[x][y] = 'K';
+    
+    last_x = x;
+    last_y = x;
+    
+    delay(1000);
+    
+    draw_board(1);
 }
 
 void display_intro_screen() {
@@ -75,6 +137,11 @@ void get_position() {
     
     if (moves) {
         board[last_x][last_y] = 'x';
+        
+        if (moves == 1) { // Save first move coordinates
+            first_x = last_x;
+            first_y = last_y;
+        }
     }
     
     while (1) {
@@ -120,9 +187,12 @@ void get_position() {
     
     for (i = -2; i <= 2; i++) {
         for (j = -2; j <= 2; j++) {
+            int move_x = x + i;
+            int move_y = y + j;
+            
             if ((abs(i) != abs(j)) && (i != 0 && j != 0)
-                && (x + i >= 0 && x + i < 8 && y + j >= 0 && y + j < 8)
-                && (board[x + i][y + j] != 'x')) {
+                && (move_x >= 0 && move_x < 8 && move_y >= 0 && move_y < 8)
+                && (board[move_x][move_y] != 'x')) {
                 available_moves++;
             }
         }
@@ -176,21 +246,46 @@ void draw_board(int available_moves) {
         square_start_y += 2;
     }
     
-    printf("%d", moves); // TEST PRINT
-    
     if (!available_moves) {
         gotoxy(2, 2);
         
         if (moves == 64) {
             printf("| You have successfully completed the knight's tour. Congratulations!");
+            
+            HIDE_CURSOR;
         } else {
+            char option;
+            
             printf("| No available moves left. Better luck next time.");
+            
+            gotoxy(25, 23);
+            printf("[1] Play Solution\t [0] Exit");
+            
+            HIDE_CURSOR;
+            
+            option = getch();
+            
+            while (option != '1' || option != '0') {
+                switch (option) {
+                    case '1':
+                        clear_board();
+                        
+                        moves = 0; // Repurpose of variable
+                        solving = 1;
+                        
+                        play_solution();
+                        
+                        break;
+                    case '0':
+                        return;
+                }
+            }
         }
-        
-        HIDE_CURSOR;
-        
-        return;
     }
     
-    get_position();
+    if (!solving) {
+        get_position();
+    } else {
+        play_solution();
+    }
 }
